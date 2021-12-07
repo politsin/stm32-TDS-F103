@@ -77,7 +77,7 @@ volatile uint8_t flag_ds18b20 = 1;
 uint32_t interval_ds18 = 800; // миллисекунды, min 800                             [A800]
 uint32_t interval_ec = 500;   // миллисекунды, min 500                             [B
 
-uint32_t referenceVoltage = 2500;  // 2500mv (напряжение питания датчиков)         [C
+uint32_t referenceVoltage = 3187;  // 2500mv (напряжение питания в попугаях)       [C
 
 uint32_t ntcR1 = 9600;    // 10kΩ voltage divider resistor value                   [D
 uint32_t ntcRo = 10000;   // 10kΩ R of Thermistor at 25 degree                     [E
