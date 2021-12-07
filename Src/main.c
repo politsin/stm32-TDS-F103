@@ -213,6 +213,7 @@ int main(void)
   trans_to_usart1(trans_str);
   #endif
 
+  // @todo: проверка целостности вмсето пустой флешки
   if(data[0] == 0xFFFFFFFF) // если флеш пустая, записываем туда дефолтные значения
   {
 	  data[0] = interval_ds18;    // 800
