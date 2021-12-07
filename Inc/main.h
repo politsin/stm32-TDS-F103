@@ -62,6 +62,8 @@ void temp_ds18b20();
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define LED_Pin GPIO_PIN_13
+#define LED_GPIO_Port GPIOC
 #define ADC1_33_Volt_Pin GPIO_PIN_0
 #define ADC1_33_Volt_GPIO_Port GPIOA
 #define ADC1_2_Volt_Pin GPIO_PIN_1
@@ -78,10 +80,8 @@ void temp_ds18b20();
 #define DS18B20_GPIO_Port GPIOA
 #define NTC_Power_Pin GPIO_PIN_8
 #define NTC_Power_GPIO_Port GPIOB
-#define LED_Pin GPIO_PIN_9
-#define LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-/////////////// ВИДИМОСТЬ //////////////
+/////////////// В�?Д�?МОСТЬ //////////////
 #define DEBUG_USART1       1
 
 /* USER CODE END Private defines */
