@@ -4,7 +4,7 @@
 		{
 			"name": "Cortex Debug",
 			"cwd": "${workspaceRoot}",
-			"executable": "./build/stm32-ec-module.elf",
+			"executable": "./build/TDS_meter_F103.elf",
 			"svdFile": "./JLink/STM32F103xx.svd",
 			"request": "launch",
 			"type": "cortex-debug",
@@ -18,7 +18,7 @@
 		{
 			"showDevDebugOutput": true,
 			"cwd": "${workspaceRoot}",
-			"executable": "./build/stm32-ec-module.elf",
+			"executable": "./build/TDS_meter_F103.elf",
 			"name": "Debug STM32",
 			"request": "launch",
 			"type": "cortex-debug",

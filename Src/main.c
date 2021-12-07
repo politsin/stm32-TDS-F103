@@ -445,8 +445,8 @@ int main(void)
 		  while((HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY));
 		  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)trans_str, len);
 
-		  if(adc_ec_positive < 2900 || adc_ec_positive > 3100) while(1){}
-		  if(adc_ec_negative < 2900 || adc_ec_negative > 3100) while(1){}
+		  // if(adc_ec_positive < 2900 || adc_ec_positive > 3100) while(1){}
+		  // if(adc_ec_negative < 2900 || adc_ec_negative > 3100) while(1){}
 
 		  //////////////// tm1637 ///////////////
 		  if(vdd >= 1000)
