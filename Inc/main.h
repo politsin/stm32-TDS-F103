@@ -81,7 +81,7 @@ void temp_ds18b20();
 #define LED_Pin GPIO_PIN_9
 #define LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-/////////////// В�?Д�?МОСТЬ //////////////
+/////////////// ВИДИМОСТЬ //////////////
 #define DEBUG_USART1       1
 
 /* USER CODE END Private defines */
