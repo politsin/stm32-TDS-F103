@@ -70,8 +70,8 @@ void temp_ds18b20();
 #define HSE_OUT_GPIO_Port GPIOD
 #define ADC1_33_Volt_Pin GPIO_PIN_0
 #define ADC1_33_Volt_GPIO_Port GPIOA
-#define ADC1_2_Volt_Pin GPIO_PIN_1
-#define ADC1_2_Volt_GPIO_Port GPIOA
+#define ADC1_25_Volt_Pin GPIO_PIN_1
+#define ADC1_25_Volt_GPIO_Port GPIOA
 #define ADC1_NTC_Pin GPIO_PIN_2
 #define ADC1_NTC_GPIO_Port GPIOA
 #define ADC2_EC_Pin GPIO_PIN_5

@@ -40,7 +40,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define COUNT_REQUEST     40 // размер буфера ацп для adc_33_volt, adc_2_volt, adc_ntc, adc_vrefint (должно быть чётное число)
+#define COUNT_REQUEST     40 // размер буфера ацп для adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint (должно быть чётное число)
 #define CH_ADC            4  // количество каналов (если тут не чётное число, то COUNT_REQUEST должен делится на него без остатка)
 #define DIV_ADC           (COUNT_REQUEST / CH_ADC)
 
@@ -273,17 +273,17 @@ int main(void)
   ///////////////////// ADC1 /////////////////////////////
   HAL_ADCEx_Calibration_Start(&hadc1); // калибровка АЦП1
   HAL_ADCEx_Calibration_Start(&hadc2); // калибровка АЦП2
-  uint16_t adc_buf[COUNT_REQUEST] = {0,}; // буфер для adc_33_volt, adc_2_volt, adc_ntc, adc_vrefint, по 10 значений каждого (#define COUNT_REQUEST)
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, COUNT_REQUEST); // опрашивает adc_33_volt, adc_2_volt, adc_ntc, adc_vrefint
+  uint16_t adc_buf[COUNT_REQUEST] = {0,}; // буфер для adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, по 10 значений каждого (#define COUNT_REQUEST)
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, COUNT_REQUEST); // опрашивает adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint
 
   /////// переменные АЦП1 ///////
   uint32_t tmp_adc_33_volt = 0;
-  uint32_t tmp_adc_2_volt = 0;
+  uint32_t tmp_adc_25_volt = 0;
   uint32_t tmp_adc_ntc = 0;
   uint32_t tmp_adc_vrefint = 0;
 
   uint16_t adc_33_volt = 0;
-  uint16_t adc_2_volt = 0;
+  uint16_t adc_25_volt = 0;
   uint16_t adc_ntc = 0;
   uint16_t adc_vrefint = 0;
 
@@ -337,7 +337,7 @@ int main(void)
 
 		  	// обнуляем временные переменные
 		    tmp_adc_33_volt = 0;
-		    tmp_adc_2_volt = 0;
+		    tmp_adc_25_volt = 0;
 		    tmp_adc_ntc = 0;
 		    tmp_adc_vrefint = 0;
 
@@ -345,20 +345,20 @@ int main(void)
 			for(uint16_t i = 0; i < (COUNT_REQUEST / CH_ADC); i++)
 			{
 				tmp_adc_33_volt += adc_buf[CH_ADC * i + 0];
-				tmp_adc_2_volt += adc_buf[CH_ADC * i + 1];
+				tmp_adc_25_volt += adc_buf[CH_ADC * i + 1];
 				tmp_adc_ntc += adc_buf[CH_ADC * i + 2];
 				tmp_adc_vrefint += adc_buf[CH_ADC * i + 3];
 			}
 
 			// усредняем
 			adc_33_volt = (tmp_adc_33_volt / DIV_ADC);
-			adc_2_volt = (tmp_adc_2_volt / DIV_ADC);
+			adc_25_volt = (tmp_adc_25_volt / DIV_ADC);
 			adc_ntc = (tmp_adc_ntc / DIV_ADC);
 			adc_vrefint = (tmp_adc_vrefint / DIV_ADC);
 
 			temp_ntc = rawNtcToTemperature(adc_ntc); // получаем температуру с NTC
 
-		  	//sprintf(trans_str, "A %d %d %d %d %ld", adc_33_volt, adc_2_volt, adc_ntc, adc_vrefint, ntc);
+		  	//sprintf(trans_str, "A %d %d %d %d %ld", adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, ntc);
 		  	//trans_to_usart1(trans_str);
 		  	//HAL_Delay(500);
 
@@ -398,8 +398,7 @@ int main(void)
 
 				for(uint8_t i = 0; i < 16; i++) temp_ds18 += (int16_t)readBit() << i;
 
-				temp_ds18 = (temp_ds18 / 16);
-
+				temp_ds18 = (1000 * temp_ds18 / 16);
 				//float t = temp_ds18 / 16.0;
 
 				flag_ds18b20 = 1; // запускаем новое измерение.
@@ -443,7 +442,7 @@ int main(void)
 
 		  ////////////////////////// Выводим все данные в УАРТ /////////////////////////////
 		  uint16_t len = snprintf(trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d %d\n", \
-				  adc_33_volt, adc_2_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18, adc_ec_positive, adc_ec_negative, vdd);
+				  adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18, adc_ec_positive, adc_ec_negative, vdd);
 
 		  while((HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY));
 		  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)trans_str, len);
@@ -515,7 +514,7 @@ int main(void)
 	  /*if((uwTick - tim_uart) > interval_uart) // кидаем данные у УАРТ с указанным интервалом
 	  {
 		  uint16_t len = snprintf(trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d\n", \
-				  adc_33_volt, adc_2_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18, adc_ec_positive, adc_ec_negative);
+				  adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18, adc_ec_positive, adc_ec_negative);
 		  trans_to_usart_data(trans_str, len);
 
 		  //snprintf(trans_str, 128, "Len %d", len);
