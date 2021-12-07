@@ -1,0 +1,4 @@
+savebin build\stm32-blink.bin, 0x00, 0x4000
+r
+g
+q
