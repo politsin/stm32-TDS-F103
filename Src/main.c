@@ -202,6 +202,9 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  // Enable power.
+  HAL_GPIO_WritePin(EC_PWR_GPIO_Port, EC_PWR_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(NTC_PWR_GPIO_Port, NTC_PWR_Pin, GPIO_PIN_RESET);
   ///////////////////// READ FLASH ////////////////////////
   uint32_t data[13] = {0,};
 
@@ -214,7 +217,7 @@ int main(void)
   #endif
 
   // @todo: проверка целостности вмсето пустой флешки
-  if(data[0] == 0xFFFFFFFF) // если флеш пустая, записываем туда дефолтные значения
+  if(1 || data[0] == 0xFFFFFFFF) // если флеш пустая, записываем туда дефолтные значения
   {
 	  data[0] = interval_ds18;    // 800
 	  data[1] = interval_ec;      // 500
@@ -1032,13 +1035,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, DIO_Pin|CLK_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, CLK_Pin|DIO_Pin|EC_PWR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DS18B20_GPIO_Port, DS18B20_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(NTC_Power_GPIO_Port, NTC_Power_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(NTC_PWR_GPIO_Port, NTC_PWR_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
@@ -1047,8 +1050,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : DIO_Pin CLK_Pin */
-  GPIO_InitStruct.Pin = DIO_Pin|CLK_Pin;
+  /*Configure GPIO pins : CLK_Pin DIO_Pin */
+  GPIO_InitStruct.Pin = CLK_Pin|DIO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -1061,12 +1064,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(DS18B20_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : NTC_Power_Pin */
-  GPIO_InitStruct.Pin = NTC_Power_Pin;
+  /*Configure GPIO pins : EC_PWR_Pin NTC_PWR_Pin */
+  GPIO_InitStruct.Pin = EC_PWR_Pin|NTC_PWR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(NTC_Power_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
