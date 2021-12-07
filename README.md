@@ -9,6 +9,7 @@
 - temp_ds18
 - adc_ec_positive
 - adc_ec_negative
+- adc_ec_delta
 - vdd
 
 ## RoadMAP

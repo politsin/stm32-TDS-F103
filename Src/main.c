@@ -309,6 +309,7 @@ int main(void)
 
   uint32_t tmp_adc_ec_negative = 0; // собирает пачку негативных значений ЕС (по умолчанию 10 - #define EC_COUNT_ADC)
   uint16_t adc_ec_negative = 0; // среднее негатив = (tmp_adc_ec_negative / EC_COUNT_ADC)
+  int16_t adc_ec_delta = 0;
 
 
   ///////////////// Готовые температуры ////////////////////
@@ -358,11 +359,11 @@ int main(void)
 
 			temp_ntc = rawNtcToTemperature(adc_ntc); // получаем температуру с NTC
 
-		  	//sprintf(trans_str, "A %d %d %d %d %ld", adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, ntc);
-		  	//trans_to_usart1(trans_str);
-		  	//HAL_Delay(500);
+		  //sprintf(trans_str, "A %d %d %d %d %ld", adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, ntc);
+		  //trans_to_usart1(trans_str);
+		  //HAL_Delay(500);
 
-		  	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, COUNT_REQUEST); // перезапускаем АЦП1
+		  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, COUNT_REQUEST); // перезапускаем АЦП1
 	  }
 
 
@@ -436,27 +437,30 @@ int main(void)
 		  }
 
 		  adc_ec_positive = (tmp_adc_ec_positive / (EC_COUNT_ADC / 2));
-		  adc_ec_negative = (tmp_adc_ec_negative / (EC_COUNT_ADC / 2));
+      adc_ec_negative = adc_25_volt - (tmp_adc_ec_negative / (EC_COUNT_ADC / 2));
+      adc_ec_delta = adc_ec_positive - adc_ec_negative;
 
-		  uint16_t vdd = 1210 * 4095 / adc_vrefint; // напряжение питания на основе Vrefint (не точно)
+      uint16_t vdd = 1210 * 4095 / adc_vrefint; // напряжение питания на основе Vrefint (не точно)
 
 		  ////////////////////////// Выводим все данные в УАРТ /////////////////////////////
-		  uint16_t len = snprintf(trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d %d\n", \
-				  adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18, adc_ec_positive, adc_ec_negative, vdd);
+      uint16_t len = snprintf(
+          trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d %d %d\n", adc_33_volt,
+          adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18,
+          adc_ec_positive, adc_ec_negative, adc_ec_delta, vdd);
 
-		  while((HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY));
-		  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)trans_str, len);
+      while ((HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY))
+        ;
+      HAL_UART_Transmit_DMA(&huart1, (uint8_t *)trans_str, len);
 
-		  // if(adc_ec_positive < 2900 || adc_ec_positive > 3100) while(1){}
-		  // if(adc_ec_negative < 2900 || adc_ec_negative > 3100) while(1){}
+      // if(adc_ec_positive < 2900 || adc_ec_positive > 3100) while(1){}
+      // if(adc_ec_negative < 2900 || adc_ec_negative > 3100) while(1){}
 
-		  //////////////// tm1637 ///////////////
-		  if(vdd >= 1000)
-		  {
-			  data_to_disp[0] = (vdd / 1000 % 10);
-			  data_to_disp[1] = (vdd / 100 % 10);
-			  data_to_disp[2] = (vdd / 10 % 10);
-			  data_to_disp[3] = vdd % 10;
+      //////////////// tm1637 ///////////////
+      if (vdd >= 1000) {
+        data_to_disp[0] = (vdd / 1000 % 10);
+        data_to_disp[1] = (vdd / 100 % 10);
+        data_to_disp[2] = (vdd / 10 % 10);
+        data_to_disp[3] = vdd % 10;
 		  }
 		  else if(vdd >= 100)
 		  {
