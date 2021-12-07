@@ -38,6 +38,11 @@ BUILD_DIR = build
 C_SOURCES =  \
 Src/main.c \
 Src/stm32f1xx_it.c \
+Src/ds18b20.c \
+Src/flash_wrt.c \
+Src/tm1637.c \
+Src/usart_ring.c \
+Src/syscalls.c \
 Src/stm32f1xx_hal_msp.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c \
