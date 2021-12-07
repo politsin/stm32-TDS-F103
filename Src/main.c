@@ -112,59 +112,59 @@ static void MX_TIM3_Init(void);
 #if DEBUG_USART1
 void trans_to_usart1(char *buf)
 {
-	uint8_t len = strlen((char*)buf);
+  uint8_t len = strlen((char*)buf);
 
-	for(uint8_t i = 0; i < len; i++)
-	{
-	  while((USART1->SR & USART_SR_TXE) == 0){}
-	  USART1->DR = buf[i];
-	}
+  for(uint8_t i = 0; i < len; i++)
+  {
+    while((USART1->SR & USART_SR_TXE) == 0){}
+    USART1->DR = buf[i];
+  }
 
-	while((USART1->SR & USART_SR_TXE) == 0){}
-	USART1->DR = '\n';
+  while((USART1->SR & USART_SR_TXE) == 0){}
+  USART1->DR = '\n';
 }
 #endif
 
 /////////// Таймер измерения времени для скорости & rpm ///////////
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	if(htim == &htim2) // ds18b20
-	{
-		flag_ds18b20 = 2;
-	}
+  if(htim == &htim2) // ds18b20
+  {
+    flag_ds18b20 = 2;
+  }
 }
 
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	if(hadc->Instance == ADC1)
-	{
-		adc_flag_full = 1;
-		HAL_ADC_Stop(&hadc1);
-	}
+  if(hadc->Instance == ADC1)
+  {
+    adc_flag_full = 1;
+    HAL_ADC_Stop(&hadc1);
+  }
 }
 
 
 int32_t rawNtcToTemperature(uint16_t Vout)
 {
-	uint32_t Rt;
-	double kelvin, celsius;
+  uint32_t Rt;
+  double kelvin, celsius;
 
-	uint32_t R1 = ntcR1; // 9600  | voltage divider resistor value
-	uint32_t Ro = ntcRo; // 10000 | R of Thermistor at 25 degree
-	uint32_t To = ntcTo; // 25 | Temperature in Kelvin for 25 degree
-	uint32_t koefB = ntcKoefB; // 3950  | Beta value
-	uint32_t mv = (referenceVoltage - Vout);
+  uint32_t R1 = ntcR1; // 9600  | voltage divider resistor value
+  uint32_t Ro = ntcRo; // 10000 | R of Thermistor at 25 degree
+  uint32_t To = ntcTo; // 25 | Temperature in Kelvin for 25 degree
+  uint32_t koefB = ntcKoefB; // 3950  | Beta value
+  uint32_t mv = (referenceVoltage - Vout);
 
-	Rt = R1 * mv / (referenceVoltage - mv);
-	kelvin = (double)Ro / (double)Rt;              // R/Ro
-	kelvin = log(kelvin);                          // ln(R/Ro)
-	kelvin = (1 / (double)koefB) * kelvin;         // 1/B * ln(R/Ro)
-	kelvin = (1 / ((double)To + 273.15)) + kelvin; // 1/To + 1/B * ln(R/Ro)
-	kelvin = 1 / kelvin; // 1/( 1/To + 1/B * ln(R/Ro) )​
+  Rt = R1 * mv / (referenceVoltage - mv);
+  kelvin = (double)Ro / (double)Rt;              // R/Ro
+  kelvin = log(kelvin);                          // ln(R/Ro)
+  kelvin = (1 / (double)koefB) * kelvin;         // 1/B * ln(R/Ro)
+  kelvin = (1 / ((double)To + 273.15)) + kelvin; // 1/To + 1/B * ln(R/Ro)
+  kelvin = 1 / kelvin; // 1/( 1/To + 1/B * ln(R/Ro) )​
 
-	celsius = kelvin - 273.15; // Convert Kelvin to Celsius.
-	return round(celsius * 1000);
+  celsius = kelvin - 273.15; // Convert Kelvin to Celsius.
+  return round(celsius * 1000);
 }
 
 /* USER CODE END 0 */
@@ -212,49 +212,49 @@ int main(void)
 
   #if DEBUG_USART1 // дефаин в файле main.h
   snprintf(trans_str, BUF_UART, "A %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu",\
-		  data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]);
+      data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]);
   trans_to_usart1(trans_str);
   #endif
 
   // @todo: проверка целостности вмсето пустой флешки
   if(1 || data[0] == 0xFFFFFFFF) // если флеш пустая, записываем туда дефолтные значения
   {
-	  data[0] = interval_ds18;    // 800
-	  data[1] = interval_ec;      // 500
-	  data[2] = referenceVoltage; // 2500
-	  data[3] = ntcR1;            // 9600
-	  data[4] = ntcRo;            // 10000
-	  data[5] = ntcTo;            // 25
-	  data[6] = ntcKoefB;         // 3950
-	  data[7] = ecRo;             // 1000
-	  data[8] = ecKoefA;          // 54790
-	  data[9] = ecKoefB;          // 90
-	  data[10] = ecKoefC;         // 34
-	  data[11] = ecKoefT;         // 0
-	  data[12] = ec_Hz;           // 9
+    data[0] = interval_ds18;    // 800
+    data[1] = interval_ec;      // 500
+    data[2] = referenceVoltage; // 2500
+    data[3] = ntcR1;            // 9600
+    data[4] = ntcRo;            // 10000
+    data[5] = ntcTo;            // 25
+    data[6] = ntcKoefB;         // 3950
+    data[7] = ecRo;             // 1000
+    data[8] = ecKoefA;          // 54790
+    data[9] = ecKoefB;          // 90
+    data[10] = ecKoefC;         // 34
+    data[11] = ecKoefT;         // 0
+    data[12] = ec_Hz;           // 9
 
-	  Write_flash_data(ADDR_FLASH_PAGE_31, data);
+    Write_flash_data(ADDR_FLASH_PAGE_31, data);
   }
   else
   {
-	  interval_ds18 = data[0];
-	  interval_ec = data[1];
-	  referenceVoltage = data[2];
-	  ntcR1 = data[3];
-	  ntcRo = data[4];
-	  ntcTo = data[5];
-	  ntcKoefB = data[6];
-	  ecRo = data[7];
-	  ecKoefA = data[8];
-	  ecKoefB = data[9];
-	  ecKoefC = data[10];
-	  ecKoefT = data[11];
-	  ec_Hz = data[12];
+    interval_ds18 = data[0];
+    interval_ec = data[1];
+    referenceVoltage = data[2];
+    ntcR1 = data[3];
+    ntcRo = data[4];
+    ntcTo = data[5];
+    ntcKoefB = data[6];
+    ecRo = data[7];
+    ecKoefA = data[8];
+    ecKoefB = data[9];
+    ecKoefC = data[10];
+    ecKoefT = data[11];
+    ec_Hz = data[12];
   }
 
   #if DEBUG_USART1
   snprintf(trans_str, BUF_UART, "B %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %lu",\
-		  interval_ds18, interval_ec, referenceVoltage, ntcR1, ntcRo, ntcTo, ntcKoefB, ecRo, ecKoefA, ecKoefB, ecKoefC, ecKoefT, ec_Hz);
+      interval_ds18, interval_ec, referenceVoltage, ntcR1, ntcRo, ntcTo, ntcKoefB, ecRo, ecKoefA, ecKoefB, ecKoefC, ecKoefT, ec_Hz);
   trans_to_usart1(trans_str);
   #endif
 
@@ -309,8 +309,10 @@ int main(void)
 
   uint32_t tmp_adc_ec_negative = 0; // собирает пачку негативных значений ЕС (по умолчанию 10 - #define EC_COUNT_ADC)
   uint16_t adc_ec_negative = 0; // среднее негатив = (tmp_adc_ec_negative / EC_COUNT_ADC)
+  // Посчитанные значения EC.
   int16_t adc_ec_delta = 0;
-
+  uint16_t adc_ec_raw = 0;
+  uint16_t ec = 0;
 
   ///////////////// Готовые температуры ////////////////////
   int32_t temp_ntc = 0;
@@ -332,117 +334,119 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(adc_flag_full == 1) // ждём флаг, который установится в прерывании АЦП1 по окончанию работы ДМА
-	  {
-		  	adc_flag_full = 0; // обнуляем флаг
+    if(adc_flag_full == 1) // ждём флаг, который установится в прерывании АЦП1 по окончанию работы ДМА
+    {
+        adc_flag_full = 0; // обнуляем флаг
 
-		  	// обнуляем временные переменные
-		    tmp_adc_33_volt = 0;
-		    tmp_adc_25_volt = 0;
-		    tmp_adc_ntc = 0;
-		    tmp_adc_vrefint = 0;
+        // обнуляем временные переменные
+        tmp_adc_33_volt = 0;
+        tmp_adc_25_volt = 0;
+        tmp_adc_ntc = 0;
+        tmp_adc_vrefint = 0;
 
-		    // разбираем данные с АЦП1 полученые через ДМА
-			for(uint16_t i = 0; i < (COUNT_REQUEST / CH_ADC); i++)
-			{
-				tmp_adc_33_volt += adc_buf[CH_ADC * i + 0];
-				tmp_adc_25_volt += adc_buf[CH_ADC * i + 1];
-				tmp_adc_ntc += adc_buf[CH_ADC * i + 2];
-				tmp_adc_vrefint += adc_buf[CH_ADC * i + 3];
-			}
+        // разбираем данные с АЦП1 полученые через ДМА
+      for(uint16_t i = 0; i < (COUNT_REQUEST / CH_ADC); i++)
+      {
+        tmp_adc_33_volt += adc_buf[CH_ADC * i + 0];
+        tmp_adc_25_volt += adc_buf[CH_ADC * i + 1];
+        tmp_adc_ntc += adc_buf[CH_ADC * i + 2];
+        tmp_adc_vrefint += adc_buf[CH_ADC * i + 3];
+      }
 
-			// усредняем
-			adc_33_volt = (tmp_adc_33_volt / DIV_ADC);
-			adc_25_volt = (tmp_adc_25_volt / DIV_ADC);
-			adc_ntc = (tmp_adc_ntc / DIV_ADC);
-			adc_vrefint = (tmp_adc_vrefint / DIV_ADC);
+      // усредняем
+      adc_33_volt = (tmp_adc_33_volt / DIV_ADC);
+      adc_25_volt = (tmp_adc_25_volt / DIV_ADC);
+      adc_ntc = (tmp_adc_ntc / DIV_ADC);
+      adc_vrefint = (tmp_adc_vrefint / DIV_ADC);
 
-			temp_ntc = rawNtcToTemperature(adc_ntc); // получаем температуру с NTC
+      temp_ntc = rawNtcToTemperature(adc_ntc); // получаем температуру с NTC
 
-		  //sprintf(trans_str, "A %d %d %d %d %ld", adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, ntc);
-		  //trans_to_usart1(trans_str);
-		  //HAL_Delay(500);
+      //sprintf(trans_str, "A %d %d %d %d %ld", adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, ntc);
+      //trans_to_usart1(trans_str);
+      //HAL_Delay(500);
 
-		  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, COUNT_REQUEST); // перезапускаем АЦП1
-	  }
-
-
-	  //////////////////////////////// DS18B20 ////////////////////////////////////
-	  if((uwTick - tim_ds18) > interval_ds18)
-	  {
-			if(flag_ds18b20 == 1)
-			{
-				flag_ds18b20 = 0;
-
-				DB18B20_PORT->BSRR = (uint32_t)DB18B20_PIN << 16u;
-				delay_us(DELAY_RESET);
-				DB18B20_PORT->BSRR = DB18B20_PIN;
-				delay_us(DELAY_RESET);
-
-				writeByte(SKIP_ROM);
-				writeByte(CONVERT_T);
-
-				TIM2->DIER |= TIM_IT_UPDATE;
-				TIM2->CR1 |= TIM_CR1_CEN;
-			}
-			else if(flag_ds18b20 == 2) // когда таймер отсчитает 750мс, он установит flag == 2
-			{
-				DB18B20_PORT->BSRR = (uint32_t)DB18B20_PIN << 16u;
-				delay_us(DELAY_RESET);
-				DB18B20_PORT->BSRR = DB18B20_PIN;
-				delay_us(DELAY_RESET);
-
-				writeByte(SKIP_ROM);
-				writeByte(READ_SCRATCHPAD);
-
-				temp_ds18 = 0;
-
-				for(uint8_t i = 0; i < 16; i++) temp_ds18 += (int16_t)readBit() << i;
-
-				temp_ds18 = (1000 * temp_ds18 / 16);
-				//float t = temp_ds18 / 16.0;
-
-				flag_ds18b20 = 1; // запускаем новое измерение.
-			}
-
-			HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // просто мигалка, можно вставить куда захочется
-			tim_ds18 = uwTick;
-	  }
+      HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, COUNT_REQUEST); // перезапускаем АЦП1
+    }
 
 
-	  //////////////////////////// EC ///////////////////////////////
-	  if((uwTick - tim_ec) > interval_ec)
-	  {
-		  tmp_adc_ec_positive = 0;
-		  tmp_adc_ec_negative = 0;
+    //////////////////////////////// DS18B20 ////////////////////////////////////
+    if((uwTick - tim_ds18) > interval_ds18)
+    {
+      if(flag_ds18b20 == 1)
+      {
+        flag_ds18b20 = 0;
 
-		  // данные с АЦП2 (ЕС) читаются постоянно, преобразование запускается по триггеру от таймера №3.
-		  // блогодаря тому, что АЦП2 работает постоянно, нам не нужно тратить время на его запуск.
-		  ADC2->DR; // читаем регистр чтоб обнулить его
+        DB18B20_PORT->BSRR = (uint32_t)DB18B20_PIN << 16u;
+        delay_us(DELAY_RESET);
+        DB18B20_PORT->BSRR = DB18B20_PIN;
+        delay_us(DELAY_RESET);
 
-		  for(uint8_t i = 0; i < EC_COUNT_ADC; i++)
-		  {
-			  while(!(ADC2->SR & ADC_SR_EOC)); // ждём следуещего преобразования
+        writeByte(SKIP_ROM);
+        writeByte(CONVERT_T);
 
-			  if((GPIOA->IDR & GPIO_PIN_8)) // проверяем пин РА8 (в каком он состоянии - позитивном или негативном)
-			  {
-				  tmp_adc_ec_positive += ADC2->DR;
-				  //trans_to_usart1("P");
-			  }
-			  else
-			  {
-				  tmp_adc_ec_negative += ADC2->DR;
-				  //trans_to_usart1("N");
-			  }
-		  }
+        TIM2->DIER |= TIM_IT_UPDATE;
+        TIM2->CR1 |= TIM_CR1_CEN;
+      }
+      else if(flag_ds18b20 == 2) // когда таймер отсчитает 750мс, он установит flag == 2
+      {
+        DB18B20_PORT->BSRR = (uint32_t)DB18B20_PIN << 16u;
+        delay_us(DELAY_RESET);
+        DB18B20_PORT->BSRR = DB18B20_PIN;
+        delay_us(DELAY_RESET);
 
-		  adc_ec_positive = (tmp_adc_ec_positive / (EC_COUNT_ADC / 2));
+        writeByte(SKIP_ROM);
+        writeByte(READ_SCRATCHPAD);
+
+        temp_ds18 = 0;
+
+        for(uint8_t i = 0; i < 16; i++) temp_ds18 += (int16_t)readBit() << i;
+
+        temp_ds18 = (1000 * temp_ds18 / 16);
+        //float t = temp_ds18 / 16.0;
+
+        flag_ds18b20 = 1; // запускаем новое измерение.
+      }
+
+      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // просто мигалка, можно вставить куда захочется
+      tim_ds18 = uwTick;
+    }
+
+
+    //////////////////////////// EC ///////////////////////////////
+    if((uwTick - tim_ec) > interval_ec)
+    {
+      tmp_adc_ec_positive = 0;
+      tmp_adc_ec_negative = 0;
+
+      // данные с АЦП2 (ЕС) читаются постоянно, преобразование запускается по триггеру от таймера №3.
+      // блогодаря тому, что АЦП2 работает постоянно, нам не нужно тратить время на его запуск.
+      ADC2->DR; // читаем регистр чтоб обнулить его
+
+      for(uint8_t i = 0; i < EC_COUNT_ADC; i++)
+      {
+        while(!(ADC2->SR & ADC_SR_EOC)); // ждём следуещего преобразования
+
+        if((GPIOA->IDR & GPIO_PIN_8)) // проверяем пин РА8 (в каком он состоянии - позитивном или негативном)
+        {
+          tmp_adc_ec_positive += ADC2->DR;
+          //trans_to_usart1("P");
+        }
+        else
+        {
+          tmp_adc_ec_negative += ADC2->DR;
+          //trans_to_usart1("N");
+        }
+      }
+
+      adc_ec_positive = (tmp_adc_ec_positive / (EC_COUNT_ADC / 2));
       adc_ec_negative = adc_25_volt - (tmp_adc_ec_negative / (EC_COUNT_ADC / 2));
       adc_ec_delta = adc_ec_positive - adc_ec_negative;
+      adc_ec_raw = (adc_ec_positive + adc_ec_negative);
+      ec = ecKoefA / (ecRo - ecKoefB) - ecKoefC;
 
       uint16_t vdd = 1210 * 4095 / adc_vrefint; // напряжение питания на основе Vrefint (не точно)
 
-		  ////////////////////////// Выводим все данные в УАРТ /////////////////////////////
+      ////////////////////////// Выводим все данные в УАРТ /////////////////////////////
       uint16_t len = snprintf(
           trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d %d %d\n", adc_33_volt,
           adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18,
@@ -461,178 +465,178 @@ int main(void)
         data_to_disp[1] = (vdd / 100 % 10);
         data_to_disp[2] = (vdd / 10 % 10);
         data_to_disp[3] = vdd % 10;
-		  }
-		  else if(vdd >= 100)
-		  {
-			  data_to_disp[0] = 0x7f; // ничего не выводит на сегмент
-			  data_to_disp[1] = (vdd / 100 % 10);
-			  data_to_disp[2] = (vdd / 10 % 10);
-			  data_to_disp[3] = vdd % 10;
-		  }
-		  else if(vdd >= 10)
-		  {
-			  data_to_disp[0] = 0x7f;
-			  data_to_disp[1] = 0x7f;
-			  data_to_disp[2] = (vdd / 10 % 10);
-			  data_to_disp[3] = vdd % 10;
-		  }
-		  else if(vdd >= 0)
-		  {
-			  data_to_disp[0] = 0x7f;
-			  data_to_disp[1] = 0x7f;
-			  data_to_disp[2] = 0x7f;
-			  data_to_disp[3] = vdd % 10;
-		  }
-		  //// Для отрицательных значений -1 -99 ////
-		  else if(vdd <= -10 && vdd >= -99)
-		  {
-			  int8_t tmp = vdd;
-			  tmp *= -1;
+      }
+      else if(vdd >= 100)
+      {
+        data_to_disp[0] = 0x7f; // ничего не выводит на сегмент
+        data_to_disp[1] = (vdd / 100 % 10);
+        data_to_disp[2] = (vdd / 10 % 10);
+        data_to_disp[3] = vdd % 10;
+      }
+      else if(vdd >= 10)
+      {
+        data_to_disp[0] = 0x7f;
+        data_to_disp[1] = 0x7f;
+        data_to_disp[2] = (vdd / 10 % 10);
+        data_to_disp[3] = vdd % 10;
+      }
+      else if(vdd >= 0)
+      {
+        data_to_disp[0] = 0x7f;
+        data_to_disp[1] = 0x7f;
+        data_to_disp[2] = 0x7f;
+        data_to_disp[3] = vdd % 10;
+      }
+      //// Для отрицательных значений -1 -99 ////
+      else if(vdd <= -10 && vdd >= -99)
+      {
+        int8_t tmp = vdd;
+        tmp *= -1;
 
-			  data_to_disp[0] = 0x7f;
-			  data_to_disp[1] = 18; // выводит на сегмент знак "минус"
-			  data_to_disp[2] = (tmp / 10 % 10);
-			  data_to_disp[3] = tmp % 10;
-		  }
-		  else if(vdd <= -1 && vdd >= -9)
-		  {
-			  int8_t tmp = vdd;
-			  tmp *= -1;
+        data_to_disp[0] = 0x7f;
+        data_to_disp[1] = 18; // выводит на сегмент знак "минус"
+        data_to_disp[2] = (tmp / 10 % 10);
+        data_to_disp[3] = tmp % 10;
+      }
+      else if(vdd <= -1 && vdd >= -9)
+      {
+        int8_t tmp = vdd;
+        tmp *= -1;
 
-			  data_to_disp[0] = 0x7f;
-			  data_to_disp[1] = 0x7f;
-			  data_to_disp[2] = 18;
-			  data_to_disp[3] = tmp % 10;
-		  }
+        data_to_disp[0] = 0x7f;
+        data_to_disp[1] = 0x7f;
+        data_to_disp[2] = 18;
+        data_to_disp[3] = tmp % 10;
+      }
 
-		  display_mass(data_to_disp);
+      display_mass(data_to_disp);
 
-		  //snprintf(trans_str, BUF_UART, "Vref: %d Vdd: %d mV\n", adc_vrefint, vdd);
-		  //trans_to_usart1(trans_str);
+      //snprintf(trans_str, BUF_UART, "Vref: %d Vdd: %d mV\n", adc_vrefint, vdd);
+      //trans_to_usart1(trans_str);
 
-		  tim_ec = uwTick;
-	  }
-
-
-	  //////////////////////////// UART //////////////////////////////
-	  /*if((uwTick - tim_uart) > interval_uart) // кидаем данные у УАРТ с указанным интервалом
-	  {
-		  uint16_t len = snprintf(trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d\n", \
-				  adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18, adc_ec_positive, adc_ec_negative);
-		  trans_to_usart_data(trans_str, len);
-
-		  //snprintf(trans_str, 128, "Len %d", len);
-		  //trans_to_usart1(trans_str);
-		  tim_uart = uwTick;
-	  }*/
+      tim_ec = uwTick;
+    }
 
 
-	  //////////////////////////// UART Приём //////////////////////////////
-	  if(uart_available()) // есть ли что-то в приёмном буфере, тогда читаем
-	  {
-		  char str[16] = {0,};
-		  uint8_t i = 0;
-		  uint8_t flag = 0;
+    //////////////////////////// UART //////////////////////////////
+    /*if((uwTick - tim_uart) > interval_uart) // кидаем данные у УАРТ с указанным интервалом
+    {
+      uint16_t len = snprintf(trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d\n", \
+          adc_33_volt, adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18, adc_ec_positive, adc_ec_negative);
+      trans_to_usart_data(trans_str, len);
 
-		  while(uart_available())
-		  {
-			  str[i] = uart_read();
-
-			  if(str[i] == ']')
-			  {
-				  str[i] = '\0';
-				  flag = 1;
-				  break;
-			  }
-			  else if(i == 15) break;
-
-			  i++;
-			  delay_us(150);
-		  }
+      //snprintf(trans_str, 128, "Len %d", len);
+      //trans_to_usart1(trans_str);
+      tim_uart = uwTick;
+    }*/
 
 
-		  if(flag && str[0] == '[')
-		  {
-			switch(str[1])
-			{
-				case 'A':
-					interval_ds18 = strtoul(&str[2], NULL, 0);
-					if(interval_ds18 < 800) interval_ds18 = 800;
-				break;
+    //////////////////////////// UART Приём //////////////////////////////
+    if(uart_available()) // есть ли что-то в приёмном буфере, тогда читаем
+    {
+      char str[16] = {0,};
+      uint8_t i = 0;
+      uint8_t flag = 0;
 
-				case 'B':
-					interval_ec = strtoul(&str[2], NULL, 0); // интервал вывода в УАРТ и опрос ЕС
-					if(interval_ec < 500) interval_ec = 500;
-				break;
+      while(uart_available())
+      {
+        str[i] = uart_read();
 
-				case 'C':
-					referenceVoltage = strtoul(&str[2], NULL, 0);
-				break;
+        if(str[i] == ']')
+        {
+          str[i] = '\0';
+          flag = 1;
+          break;
+        }
+        else if(i == 15) break;
 
-				case 'D':
-					ntcR1 = strtoul(&str[2], NULL, 0);
-				break;
+        i++;
+        delay_us(150);
+      }
 
-				case 'E':
-					ntcRo = strtoul(&str[2], NULL, 0);
-				break;
 
-				case 'F':
-					ntcTo = strtoul(&str[2], NULL, 0);
-				break;
+      if(flag && str[0] == '[')
+      {
+      switch(str[1])
+      {
+        case 'A':
+          interval_ds18 = strtoul(&str[2], NULL, 0);
+          if(interval_ds18 < 800) interval_ds18 = 800;
+        break;
 
-				case 'G':
-					ntcKoefB = strtoul(&str[2], NULL, 0);
-				break;
+        case 'B':
+          interval_ec = strtoul(&str[2], NULL, 0); // интервал вывода в УАРТ и опрос ЕС
+          if(interval_ec < 500) interval_ec = 500;
+        break;
 
-				case 'K':
-					ecRo = strtoul(&str[2], NULL, 0);
-				break;
+        case 'C':
+          referenceVoltage = strtoul(&str[2], NULL, 0);
+        break;
 
-				case 'L':
-					ecKoefA = strtoul(&str[2], NULL, 0);
-				break;
+        case 'D':
+          ntcR1 = strtoul(&str[2], NULL, 0);
+        break;
 
-				case 'M':
-					ecKoefB = strtoul(&str[2], NULL, 0);
-				break;
+        case 'E':
+          ntcRo = strtoul(&str[2], NULL, 0);
+        break;
 
-				case 'N':
-					ecKoefC = strtoul(&str[2], NULL, 0);
-				break;
+        case 'F':
+          ntcTo = strtoul(&str[2], NULL, 0);
+        break;
 
-				case 'P':
-					ecKoefT = strtoul(&str[2], NULL, 0);
-				break;
+        case 'G':
+          ntcKoefB = strtoul(&str[2], NULL, 0);
+        break;
 
-				case 'Q':
-					ec_Hz = strtoul(&str[2], NULL, 0);
-					if(ec_Hz < 9) ec_Hz = 9;
-				break;
+        case 'K':
+          ecRo = strtoul(&str[2], NULL, 0);
+        break;
 
-				default:
-				break;
-			}
+        case 'L':
+          ecKoefA = strtoul(&str[2], NULL, 0);
+        break;
 
-			data[0] = interval_ds18;
-			data[1] = interval_ec;
-			data[2] = referenceVoltage;
-			data[3] = ntcR1;
-			data[4] = ntcRo;
-			data[5] = ntcTo;
-			data[6] = ntcKoefB;
-			data[7] = ecRo;
-			data[8] = ecKoefA;
-			data[9] = ecKoefB;
-			data[10] = ecKoefC;
-			data[11] = ecKoefT;
-			data[12] = ec_Hz;
+        case 'M':
+          ecKoefB = strtoul(&str[2], NULL, 0);
+        break;
 
-			Write_flash_data(ADDR_FLASH_PAGE_31, data); // сохраняем данные (сохранение в одну страницу флеша, поэтому все значения перезаписываются)
+        case 'N':
+          ecKoefC = strtoul(&str[2], NULL, 0);
+        break;
 
-			if(str[1] == 'Q') NVIC_SystemReset(); // если изменилась частота, тогда ресетим камень
-		  }
-	  }
+        case 'P':
+          ecKoefT = strtoul(&str[2], NULL, 0);
+        break;
+
+        case 'Q':
+          ec_Hz = strtoul(&str[2], NULL, 0);
+          if(ec_Hz < 9) ec_Hz = 9;
+        break;
+
+        default:
+        break;
+      }
+
+      data[0] = interval_ds18;
+      data[1] = interval_ec;
+      data[2] = referenceVoltage;
+      data[3] = ntcR1;
+      data[4] = ntcRo;
+      data[5] = ntcTo;
+      data[6] = ntcKoefB;
+      data[7] = ecRo;
+      data[8] = ecKoefA;
+      data[9] = ecKoefB;
+      data[10] = ecKoefC;
+      data[11] = ecKoefT;
+      data[12] = ec_Hz;
+
+      Write_flash_data(ADDR_FLASH_PAGE_31, data); // сохраняем данные (сохранение в одну страницу флеша, поэтому все значения перезаписываются)
+
+      if(str[1] == 'Q') NVIC_SystemReset(); // если изменилась частота, тогда ресетим камень
+      }
+    }
 
 
     /* USER CODE END WHILE */

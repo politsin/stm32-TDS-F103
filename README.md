@@ -1,16 +1,18 @@
 # stm32-TDS-F103
 
 ## Output data:
+- ec (посчитанное значение EC)
+- adc_ec_raw (EC в попугаях)
+- adc_ec_delta (разница между измерениями)
+- adc_ec_positive
+- adc_ec_negative
 - adc_33_volt
-- adc_2_volt
+- adc_25_volt
 - adc_ntc
 - adc_vrefint
 - temp_ntc
 - temp_ds18
-- adc_ec_positive
-- adc_ec_negative
-- adc_ec_delta
-- vdd
+- vdd (напряжение питания в миливольтах)
 
 ## RoadMAP
 - [ ] 3 кнопочки настроек или енкодер
