@@ -10,29 +10,31 @@
 
 #include "main.h"
 
-#define CLK_HIGH	(HAL_GPIO_WritePin(CLK_GPIO_Port, CLK_Pin, GPIO_PIN_SET))
-#define CLK_LOW		(HAL_GPIO_WritePin(CLK_GPIO_Port, CLK_Pin, GPIO_PIN_RESET))
+#define CLK_HIGH (HAL_GPIO_WritePin(X_SCL_GPIO_Port, X_SCL_Pin, GPIO_PIN_SET))
+#define CLK_LOW (HAL_GPIO_WritePin(X_SCL_GPIO_Port, X_SCL_Pin, GPIO_PIN_RESET))
 
-#define DIO_HIGH	(HAL_GPIO_WritePin(DIO_GPIO_Port, DIO_Pin, GPIO_PIN_SET))
-#define DIO_LOW		(HAL_GPIO_WritePin(DIO_GPIO_Port, DIO_Pin, GPIO_PIN_RESET))
+#define DIO_HIGH (HAL_GPIO_WritePin(X_SDA_GPIO_Port, X_SDA_Pin, GPIO_PIN_SET))
+#define DIO_LOW (HAL_GPIO_WritePin(X_SDA_GPIO_Port, X_SDA_Pin, GPIO_PIN_RESET))
 
-#define DIO_READ	(HAL_GPIO_ReadPin(DIO_GPIO_Port, DIO_Pin))
+#define DIO_READ (HAL_GPIO_ReadPin(X_SDA_GPIO_Port, X_SDA_Pin))
 
-#define ADDR_AUTO  0x40
+#define ADDR_AUTO 0x40
 #define ADDR_FIXED 0x44
 
-#define STARTADDR  0xc0
+#define STARTADDR 0xc0
 
-void tm1637_init(int clk, int data);
-void writeByte_tm1637(int8_t wr_data); //write 8bit data to tm1637
-void start(void);//send start bits
-void stop(void); //send stop bits
+void tm1637_writeByte(int8_t wr_data); // write 8bit data to tm1637
+void start(void);               // send start bits
+void stop(void);                // send stop bits
 void display_mass(int8_t DispData[]);
-void display(uint8_t BitAddr,int8_t DispData);
+void display(uint8_t BitAddr, int8_t DispData);
 void clearDisplay(void);
-void set_brightness(uint8_t brightness); //To take effect the next time it displays.
-void point(uint8_t cmd); //whether to light the clock point ":".To take effect the next time it displays.
+// To take effect the next time it displays.
+void set_brightness(uint8_t brightness);
+// Whether to light the clock point ":". Eeffect the next time.
+void point(uint8_t cmd); 
 void coding_mass(int8_t DispData[]);
 int8_t coding(int8_t DispData);
 
+void displayShow(int16_t number);
 #endif /* TM1637_H_ */

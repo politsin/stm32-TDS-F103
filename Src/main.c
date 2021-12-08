@@ -470,47 +470,38 @@ int main(void)
       // if(adc_ec_negative < 2900 || adc_ec_negative > 3100) while(1){}
 
       //////////////// tm1637 ///////////////
-      if (vdd >= 1000) {
-        data_to_disp[0] = (vdd / 1000 % 10);
-        data_to_disp[1] = (vdd / 100 % 10);
-        data_to_disp[2] = (vdd / 10 % 10);
-        data_to_disp[3] = vdd % 10;
-      }
-      else if(vdd >= 100)
-      {
+      if (ec >= 1000) {
+        data_to_disp[0] = (ec / 1000 % 10);
+        data_to_disp[1] = (ec / 100 % 10);
+        data_to_disp[2] = (ec / 10 % 10);
+        data_to_disp[3] = ec % 10;
+      } else if (ec >= 100) {
         data_to_disp[0] = 0x7f; // ничего не выводит на сегмент
-        data_to_disp[1] = (vdd / 100 % 10);
-        data_to_disp[2] = (vdd / 10 % 10);
-        data_to_disp[3] = vdd % 10;
-      }
-      else if(vdd >= 10)
-      {
+        data_to_disp[1] = (ec / 100 % 10);
+        data_to_disp[2] = (ec / 10 % 10);
+        data_to_disp[3] = ec % 10;
+      } else if (ec >= 10) {
         data_to_disp[0] = 0x7f;
         data_to_disp[1] = 0x7f;
-        data_to_disp[2] = (vdd / 10 % 10);
-        data_to_disp[3] = vdd % 10;
-      }
-      else if(vdd >= 0)
-      {
+        data_to_disp[2] = (ec / 10 % 10);
+        data_to_disp[3] = ec % 10;
+      } else if (ec >= 0) {
         data_to_disp[0] = 0x7f;
         data_to_disp[1] = 0x7f;
         data_to_disp[2] = 0x7f;
-        data_to_disp[3] = vdd % 10;
+        data_to_disp[3] = ec % 10;
       }
       //// Для отрицательных значений -1 -99 ////
-      else if(vdd <= -10 && vdd >= -99)
-      {
-        int8_t tmp = vdd;
+      else if (ec <= -10 && ec >= -99) {
+        int8_t tmp = ec;
         tmp *= -1;
 
         data_to_disp[0] = 0x7f;
         data_to_disp[1] = 18; // выводит на сегмент знак "минус"
         data_to_disp[2] = (tmp / 10 % 10);
         data_to_disp[3] = tmp % 10;
-      }
-      else if(vdd <= -1 && vdd >= -9)
-      {
-        int8_t tmp = vdd;
+      } else if (ec <= -1 && ec >= -9) {
+        int8_t tmp = ec;
         tmp *= -1;
 
         data_to_disp[0] = 0x7f;
@@ -1052,7 +1043,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, CLK_Pin|DIO_Pin|EC_PWR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, X_SCL_Pin|X_SDA_Pin|EC_PWR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DS18B20_GPIO_Port, DS18B20_Pin, GPIO_PIN_RESET);
@@ -1067,10 +1058,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : CLK_Pin DIO_Pin */
-  GPIO_InitStruct.Pin = CLK_Pin|DIO_Pin;
+  /*Configure GPIO pins : X_SCL_Pin X_SDA_Pin */
+  GPIO_InitStruct.Pin = X_SCL_Pin|X_SDA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 

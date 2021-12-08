@@ -76,10 +76,10 @@ void temp_ds18b20();
 #define ADC1_NTC_GPIO_Port GPIOA
 #define ADC2_EC_Pin GPIO_PIN_5
 #define ADC2_EC_GPIO_Port GPIOA
-#define CLK_Pin GPIO_PIN_10
-#define CLK_GPIO_Port GPIOB
-#define DIO_Pin GPIO_PIN_11
-#define DIO_GPIO_Port GPIOB
+#define X_SCL_Pin GPIO_PIN_10
+#define X_SCL_GPIO_Port GPIOB
+#define X_SDA_Pin GPIO_PIN_11
+#define X_SDA_GPIO_Port GPIOB
 #define DS18B20_Pin GPIO_PIN_11
 #define DS18B20_GPIO_Port GPIOA
 #define EC_PWR_Pin GPIO_PIN_3
