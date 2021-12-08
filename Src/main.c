@@ -85,9 +85,9 @@ uint32_t ntcTo = 25;      // 25 Temperature in Kelvin for 25 degree             
 uint32_t ntcKoefB = 3950; // 3950 Beta value                                       [G
 
 int32_t ecRo = 1000;      //  Ω Voltage divider resistor value 500Ω / 1000Ω        [K
-int32_t ecKoefA = 54790;  //  Alfa value                                           [L
-int32_t ecKoefB = 90;     //  Beta value                                           [M
-int32_t ecKoefC = 34;     //  С-value                                              [N
+int32_t ecKoefA = 1627166;//  Alfa value [L
+int32_t ecKoefB = -180;   //  Beta value                                           [M
+int32_t ecKoefC = 898;    //  С-value                                              [N
 int32_t ecKoefT = 0;      //  Ноль Koef Temperature                                [P
 
 uint32_t ec_Hz = 9;       // Частота PWM (в микросек, min 9, max 65535)            [Q
@@ -145,7 +145,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 }
 
 
-int32_t rawNtcToTemperature(uint16_t Vout)
+int16_t rawNtcToTemperature(uint16_t Vout)
 {
   uint32_t Rt;
   double kelvin, celsius;
@@ -227,9 +227,9 @@ int main(void)
     data[5] = ntcTo;            // 25
     data[6] = ntcKoefB;         // 3950
     data[7] = ecRo;             // 1000
-    data[8] = ecKoefA;          // 54790
-    data[9] = ecKoefB;          // 90
-    data[10] = ecKoefC;         // 34
+    data[8] = ecKoefA;          // 102545
+    data[9] = ecKoefB;          // 99
+    data[10] = ecKoefC;         // 5
     data[11] = ecKoefT;         // 0
     data[12] = ec_Hz;           // 9
 
@@ -315,7 +315,7 @@ int main(void)
   uint16_t ec = 0;
 
   ///////////////// Готовые температуры ////////////////////
-  int32_t temp_ntc = 0;
+  int16_t temp_ntc = 0;
   int16_t temp_ds18 = 0;
 
 
@@ -441,19 +441,29 @@ int main(void)
       adc_ec_positive = (tmp_adc_ec_positive / (EC_COUNT_ADC / 2));
       adc_ec_negative = adc_25_volt - (tmp_adc_ec_negative / (EC_COUNT_ADC / 2));
       adc_ec_delta = adc_ec_positive - adc_ec_negative;
-      adc_ec_raw = (adc_ec_positive + adc_ec_negative);
-      ec = ecKoefA / (ecRo - ecKoefB) - ecKoefC;
+      adc_ec_raw = (adc_ec_positive + adc_ec_negative) / 2;
+      uint16_t R = ecRo * (referenceVoltage - adc_ec_raw) / adc_ec_raw;
+      ec = ecKoefA / (R - ecKoefB) - ecKoefC;
 
       uint16_t vdd = 1210 * 4095 / adc_vrefint; // напряжение питания на основе Vrefint (не точно)
 
       ////////////////////////// Выводим все данные в УАРТ /////////////////////////////
       uint16_t len = snprintf(
-          trans_str, BUF_UART, "%d %d %d %d %ld %d %d %d %d %d\n", adc_33_volt,
-          adc_25_volt, adc_ntc, adc_vrefint, temp_ntc, temp_ds18,
-          adc_ec_positive, adc_ec_negative, adc_ec_delta, vdd);
-
-      while ((HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY))
-        ;
+          trans_str, BUF_UART, "EC:%d R:%d RAW:%d |%d %d| Δ %d %d %d %d %d %d %d %d\n", 
+          ec,
+          R,
+          adc_ec_raw,
+          temp_ntc / 1000, 
+          temp_ds18 / 1000,
+          adc_ec_delta, 
+          adc_ec_positive, 
+          adc_ec_negative, 
+          adc_33_volt,
+          adc_25_volt, 
+          adc_ntc, 
+          adc_vrefint, 
+          vdd);
+      while ((HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY));
       HAL_UART_Transmit_DMA(&huart1, (uint8_t *)trans_str, len);
 
       // if(adc_ec_positive < 2900 || adc_ec_positive > 3100) while(1){}
