@@ -265,10 +265,6 @@ int main(void)
   /////////////////////// tm1637/////////////////////////////
   set_brightness(7); // 0 - 7 яркость
   clearDisplay();    // очистка дисплея
-  for (uint16_t i = 0; i < 9999; i++) {
-    HAL_Delay(100);
-    displayShow(i);
-  }
   int8_t data_to_disp[4] = {0,};
 
   ///////////////////// DS18B20 ///////////////////////////
@@ -1064,8 +1060,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : X_SCL_Pin X_SDA_Pin */
   GPIO_InitStruct.Pin = X_SCL_Pin|X_SDA_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
