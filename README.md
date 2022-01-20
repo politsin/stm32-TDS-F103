@@ -42,3 +42,8 @@
 | ADC 2500    | ADC1_25        | PA7       | PA1 [!]   |
 | ADC NTC     | ADC1_NTC       | PA6       | PA2 [!]   |
 | ADC EC      | ADC2_EC        | PA5       | PA5       |
+
+## Thnks
+Спасибо за работку прошивки 
+- https://istarik.ru/
+- https://t.me/stm32std
